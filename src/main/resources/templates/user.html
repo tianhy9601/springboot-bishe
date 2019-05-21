@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta content="text/html;charset=UTF-8"/>
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="stylesheet" href="../public/layui/css/layui.css"/>
+    <link rel="stylesheet" th:href="@{public/css/bootstrap.min.css}" />
+    <script src="../public/layui/layui.js"></script>
+    <script src="../public/jquery-3.3.1.min.js"></script>
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+        }
+        .starter-template {
+            padding: 40px 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<form class="layui-form" action="" id="edit" style="margin: 20px;display: none">
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="width: 100px">文件名称:</label>
+        <div class="layui-input-block">
+            <input type="text" name="fileName" lay-verify="required" placeholder="请输入文件名" autocomplete="off"
+                   class="layui-input"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="tijiao" style="float: right">提交</button>
+        </div>
+    </div>
+</form>
+<div class="layui-container">
+    <ul class="layui-nav">
+        <li class="layui-nav-item">
+            <a href="">控制台<span class="layui-badge">9</span></a>
+        </li>
+        <li class="layui-nav-item">
+            <a href="">个人中心<span class="layui-badge-dot"></span></a>
+        </li>
+        <li class="layui-nav-item">
+            <a href="">我</a>
+            <dl class="layui-nav-child">
+                <dd><a href="/updateUser">修改账号</a></dd>
+                <!--<dd><a href="javascript:;">安全管理</a></dd>-->
+                <dd><a href="/logout">退了</a></dd>
+            </dl>
+        </li>
+    </ul>
+
+    <div class="layui-upload">
+        <button type="button" class="layui-btn layui-btn-normal" id="upload">选择文件</button>
+        <button type="button" class="layui-btn" id="test9">开始上传</button>
+    </div>
+    <table class="layui-hide" id="test" lay-filter="test"></table>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="download">下载</a>
+        {{# if(d.pass == "0"){ }}
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        {{#  } else { }}
+        <a class="layui-btn layui-btn-xs layui-btn-disabled">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs layui-btn-disabled">删除</a>
+        {{#  } }}
+    </script>
+
+</div>
+<script>
+
+    layui.use(['upload','element','table', 'form'], function() {
+        var $ = layui.jquery
+            , upload = layui.upload;
+        var table = layui.table;
+        var element=layui.element;
+        var form = layui.form;
+        upload.render({
+            elem: '#upload'
+            , url: '/upload/'
+            , auto: false
+            ,bindAction: '#test9'
+            ,exts: 'zip|rar|7z'
+            , before: function (obj) {
+                layer.load();
+            }
+            , done: function (res) {//上传完毕回调
+                layer.open({
+                    content:'上传成功'
+                })
+                layer.closeAll('loading');
+                location.reload();
+            }
+            , error: function () {//请求异常回调
+                layer.closeAll('loading');
+                layer.msg('网络异常，请稍后重试！');
+            }
+        });
+        table.render({
+            elem: '#test'
+            ,url:'/select/'
+            ,title: '用户数据表'
+            ,cols: [[
+                {field:'id', title:'ID', width:80,  unresize: false, sort: true}
+                ,{field:'fileName', title:'文件名', width:120, edit: 'text'}
+                ,{field:'fileUrl', title:'文件地址', width:150, edit: 'text'}
+                ,{field:'stuId', title:'用户ID', width:120, edit: 'text'}
+                ,{field:'pass', title:'审核', hide: true}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200}
+            ]]
+            ,page: true
+        });
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            //console.log(obj)
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.ajax({
+                        url: "/delete/" + obj.data.id,
+                        type: 'delete',
+                        async: true,
+                        dataType: 'json',
+                        success: function () {
+                        }
+                    })
+                    obj.del();
+                    layui.use('layer', function () {
+                        var layer = layui.layer;
+                        layer.msg('删除文件成功', {offset: 'lb'});
+                    });
+                    layer.close(index);
+                    location.reload();
+                });
+            } else if(obj.event === 'download'){
+                window.location.href = "/download/"+data.id;
+            }else if(obj.event === 'edit') {
+                var index = layer.open({
+                    type: 1,
+                    title: '编辑文件名',
+                    offset: 'auto',
+                    content:$('#edit'),
+                    success: function (layero, index) {
+                        form.on('submit(tijiao)', function (e) {
+                            data.fileName = $("input[name='fileName']").val();
+                            $.ajax({
+                                url: '/edit/' + obj.data.id,
+                                type: 'put',
+                                data: JSON.stringify(data),
+                                contentType: 'application/json',
+                                success: function () {
+                                    layui.use('layer', function () {
+                                        var layer = layui.layer;
+                                        layer.msg('修改文件名成功', {offset: 'lb'});
+                                    });
+                                    layer.close(index)
+                                    setTimeout(table.reload('test', {
+                                        url: '/select/' //数据接口
+                                        , where: {} //设定异步数据接口的额外参数
+                                    }),1000);
+
+                                }
+                            })
+                        });
+
+                    },
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

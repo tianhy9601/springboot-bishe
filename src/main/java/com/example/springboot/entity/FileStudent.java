@@ -19,6 +19,28 @@ public class FileStudent {
 
     private Integer  stuId;
 
+    private Integer teacherId;
+
+    private String stuName;
+
+    private String fileClass;
+
+    public String getFileClass() {
+        return fileClass;
+    }
+
+    public void setFileClass(String fileClass) {
+        this.fileClass = fileClass;
+    }
+
+    public Integer getTeacherId() {
+        return teacherId;
+    }
+
+    public void setTeacherId(Integer teacherId) {
+        this.teacherId = teacherId;
+    }
+
     public Integer getPass() {
         return pass;
     }
@@ -59,5 +81,13 @@ public class FileStudent {
 
     public void setStuId(Integer stuId) {
         this.stuId = stuId;
+    }
+
+    public String getStuName() {
+        return stuName;
+    }
+
+    public void setStuName(String stuName) {
+        this.stuName = stuName;
     }
 }

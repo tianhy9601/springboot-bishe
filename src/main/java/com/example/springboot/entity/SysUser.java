@@ -1,5 +1,6 @@
 package com.example.springboot.entity;
 
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -19,6 +20,17 @@ public class SysUser {
     private String password;
 
     private String realname;
+
+    public Integer getIsTeacher() {
+        return isTeacher;
+    }
+
+    public void setIsTeacher(Integer isTeacher) {
+        this.isTeacher = isTeacher;
+    }
+
+    @Column(name = "is_teacher")
+    private Integer isTeacher;
 
     public String getRealname() {
         return realname;

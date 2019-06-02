@@ -5,6 +5,8 @@
         <id property="id" column="ID"/>
         <result property="username" column="username"/>
         <result property="password" column="PASSWORD"/>
+        <result property="isTeacher" column="is_teacher"/>
+        <result property="realname" column="realname"/>
         <collection property="roles" ofType="com.example.springboot.entity.SysRole">
             <result column="name" property="name"/>
         </collection>

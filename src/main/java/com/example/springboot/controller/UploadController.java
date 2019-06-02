@@ -1,8 +1,11 @@
 package com.example.springboot.controller;
 
+import com.example.springboot.dao.FileStudentDao;
+import com.example.springboot.dao.StudentDao;
 import com.example.springboot.dao.UserDao;
 import com.example.springboot.entity.FileStudent;
 import com.example.springboot.entity.Response;
+import com.example.springboot.entity.SysStudent;
 import com.example.springboot.entity.SysUser;
 import com.example.springboot.service.UploadFile;
 import com.example.springboot.service.UserService;
@@ -28,10 +31,16 @@ public class UploadController {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    StudentDao studentDao;
+
+    @Autowired
+    FileStudentDao fileSload;
+
     //处理文件上传
     @RequestMapping(value = "/upload",method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Response> uploadImg(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws Exception {
+    public ResponseEntity<Response> uploadImg(@RequestParam("fileClass") String fileClass,@RequestParam("file") MultipartFile file, HttpServletRequest request) throws Exception {
         String fileName = file.getOriginalFilename();
         //获取文件后缀名
         String prefix=fileName.substring(fileName.lastIndexOf(".")+1);
@@ -44,12 +53,21 @@ public class UploadController {
         //上传
         FileUtil.uploadFile(file.getBytes(), filePath, fileName+"."+prefix);
         FileStudent fileStudent = new FileStudent();
+        fileStudent.setFileClass(fileClass);
+        if(fileSload.select(fileStudent).size()!=0){
+            return ResponseEntity.ok().body(new Response(false,file.getOriginalFilename(),null));
+        }
         fileStudent.setFileName(file.getOriginalFilename());
         fileStudent.setFileUrl(filePath+fileName+"."+prefix);
         fileStudent.setPass(0);
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         SysUser sysUser = userDao.findByUserName(principal.getUsername());
+        int ss=sysUser.getId();
+        SysStudent tea=studentDao.selectByPrimaryKey(ss);
+        int tt=tea.getTeacherId();
+        fileStudent.setTeacherId(tt);
         fileStudent.setStuId(sysUser.getId());
+        fileStudent.setStuName(sysUser.getRealname());
         upLoad.save(fileStudent);
         //返回文件的存放路径
         return ResponseEntity.ok().body(new Response(true,file.getOriginalFilename(),null));

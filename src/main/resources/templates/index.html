@@ -29,6 +29,10 @@
         </li>
         <li class="layui-nav-item">
             <a href="">个人中心<span class="layui-badge-dot"></span></a>
+            <dl class="layui-nav-child">
+                <dd><a href="/teaInformation">个人信息</a></dd>
+                <dd><a href="/information">学生信息</a></dd>
+            </dl>
         </li>
         <li class="layui-nav-item">
             <a href="">我</a>
@@ -66,8 +70,11 @@
                 {field:'id', title:'ID', width:80,  unresize: false, sort: true}
                 ,{field:'fileName', title:'文件名', width:120, edit: 'text'}
                 ,{field:'fileUrl', title:'文件地址', width:150, edit: 'text'}
-                ,{field:'stuId', title:'用户ID', width:120, edit: 'text'}
+                ,{field:'stuName', title:'用户名', width:120, edit: 'text'}
+                ,{field:'fileClass', title:'毕业设计资料类型', width:160, edit: 'text'}
+                ,{field:'stuId', title:'用户id', hide:true}
                 ,{field:'pass', title:'审核', hide: true}
+                , {field: 'teacherId', title: '教师id', hide: true}
                 ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
             ]]
             ,page: true

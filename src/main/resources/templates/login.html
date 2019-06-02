@@ -37,7 +37,7 @@
 
     <div class="starter-template">
         <p th:if="${param.logout}" class="bg-warning">已成功注销</p><!-- 1 -->
-        <p th:if="${param.error}" class="bg-danger">有错误，请重试</p> <!-- 2 -->
+        <p th:if="${param.error}" class="bg-danger">登录失败，有错误，请重试</p> <!-- 2 -->
         <h2>请使用账号密码登录</h2>
         <form name="form" th:action="@{/login}" action="/login" method="POST"> <!-- 3 -->
             <div class="form-group">
